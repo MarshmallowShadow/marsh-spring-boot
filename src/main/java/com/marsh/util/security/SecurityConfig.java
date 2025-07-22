@@ -1,4 +1,4 @@
-package com.vitasoft.allconec.core.security;
+package com.marsh.util.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.marsh.util.jwt.JwtAuthenticationFilter;
@@ -10,6 +10,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -33,21 +34,13 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .httpBasic(httpBasic -> httpBasic.disable())
-                .csrf(csrf -> csrf.disable())
+                .httpBasic(AbstractHttpConfigurer::disable)
+                .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> {})
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/v2/users/**").hasAnyRole(USER, GUEST)
-                        .requestMatchers("/v2/organization/**").hasAnyRole(USER)
-                        .requestMatchers("/v2/organization").hasAnyRole(USER)
-                        .requestMatchers("/v2/shop/connection-old-users").permitAll()
-                        .requestMatchers("/v2/shop/**").hasAnyRole(USER, GUEST)
-                        .requestMatchers(HttpMethod.PUT, "/v2/boards/**").hasAnyRole(USER, GUEST)
-                        .requestMatchers(HttpMethod.POST, "/v2/boards/**").hasAnyRole(USER, GUEST)
-                        .requestMatchers(HttpMethod.PATCH, "/v2/boards/**").hasAnyRole(USER, GUEST)
-                        .requestMatchers("/v2/**").permitAll()
+                        .requestMatchers("/**").permitAll()
                 )
                 .addFilterBefore(
                         new JwtAuthenticationFilter(objectMapper, jwtTokenProvider),
